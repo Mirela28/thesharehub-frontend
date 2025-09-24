@@ -15,26 +15,29 @@ export default function Register() {
         confirmPassword: '',
     });
 
+    const [errors, setErrors] = useState([]);
+
     const handleChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value });
     };
 
     const onSubmit = async(e) => {
         e.preventDefault();
-
-        const { confirmPassword, ...userToSend } = user;
-
-        if (user.password !== confirmPassword) {
-            alert("Passwords do not match!");
-            return;
-        }
+        setErrors([]);
 
         try{
-        await axios.post('http://localhost:8080/adduser', userToSend);
-        navigate('/login');
+        const response = await axios.post('http://localhost:8080/users/signup', user);
+        if(response.status === 201){
+          alert("Registration successful! Please log in.");
+          navigate('/login');
+        }
         }catch(error){
-            console.error("Error registering user: ", error);
-            alert("Registration failed. Please try again.");
+            if (error.response && error.response.status === 400) {
+              setErrors(error.response.data.errors);
+            }
+            else {
+              setErrors(["An unexpected error occurred. Please try again."]);
+            }
         }
     };
 
@@ -176,33 +179,20 @@ export default function Register() {
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
             </div>
-
-            <div className="flex items-start">
-              <div className="flex items-center h-5">
-                <input
-                  id="terms"
-                  aria-describedby="terms"
-                  type="checkbox"
-                  required
-                  className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-[#3B82F6]"
-                />
-              </div>
-              <div className="ml-3 text-sm">
-                <label htmlFor="terms" className="text-gray-500">
-                  I accept the{' '}
-                  <a href="#" className="font-medium text-[#3B82F6] hover:underline">
-                    Terms and Conditions
-                  </a>
-                </label>
-              </div>
-            </div>
-
             <button
               type="submit"
               className="w-full text-white bg-[#3B82F6] hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-[#3B82F6] font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             >
               Create an account
             </button>
+
+            {errors.length > 0 && (
+            <div className="mb-4">
+              {errors.map((error, index) => (
+                <p key={index} className="text-red-500 text-sm">{error}</p>
+              ))}
+            </div>
+          )}
 
             <p className="text-sm font-light text-gray-500">
               Already have an account?{' '}

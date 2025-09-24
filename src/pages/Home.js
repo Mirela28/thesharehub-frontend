@@ -3,18 +3,6 @@ import axios from 'axios';
 
 export default function Home() {
 
-    const [users, setUsers] = useState([]);
-
-    useEffect(() => {
-        loadUsers();
-    }, []);
-
-    const loadUsers=async()=>{
-        const result = await axios.get("http://localhost:8080/getusers");
-        console.log(result.data);
-    }
-
-
   return (
     <div>
         <p className="mt-40 text-[2.5rem] font-bold text-center text-[#0A236D] font-inter">
