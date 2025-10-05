@@ -111,7 +111,8 @@ export default function Home() {
     {/* Card 1 */}
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <img
-        src="https://via.placeholder.com/400x200"
+        //src="https://via.placeholder.com/400x200"
+        src=""
         alt="Card 1"
         className="w-full h-48 object-cover"
       />
@@ -124,7 +125,8 @@ export default function Home() {
     {/* Card 2 */}
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <img
-        src="https://via.placeholder.com/400x200"
+        //src="https://via.placeholder.com/400x200"
+        src=""
         alt="Card 2"
         className="w-full h-48 object-cover"
       />
@@ -137,7 +139,8 @@ export default function Home() {
     {/* Card 3 */}
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <img
-        src="https://via.placeholder.com/400x200"
+        //src="https://via.placeholder.com/400x200"
+        src=""
         alt="Card 3"
         className="w-full h-48 object-cover"
       />
