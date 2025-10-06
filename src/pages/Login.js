@@ -26,8 +26,14 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/users/login', user);
+      const response = await axios.post('http://localhost:8080/users/login', user, {withCredentials: true});
       if (response.status === 200) {
+        const meResponse = await axios.get('http://localhost:8080/users/me',
+          { withCredentials:true });
+        if(meResponse.data.authenticated) {
+          setUser(meResponse.data.user);
+        }
+        
         navigate('/');
       }
     } catch (error) {
