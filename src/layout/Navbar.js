@@ -2,45 +2,10 @@ import React, { useEffect, useState } from 'react';
 import logo from '../assets/logo.png';
 import account from '../assets/account.png';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { useUser } from '../contexts/UserContext';
 
-
-export default function Navbar({ hideContent, user }) {
-
-  // const [user, setUser] = useState(undefined);
-  // const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     try {
-  //       const response = await axios.get('http://localhost:8080/users/me', {
-  //         withCredentials: true
-  //       });
-  //       if(response.data.authenticated) {
-  //         setUser(response.data.user);
-  //       } else {
-  //         setUser(null);
-  //       }
-  //     } catch (error) {
-  //       setUser(null);
-  //     } finally {
-  //       setLoading(false)
-  //     }
-  //   };
-
-  //   fetchUser();
-  // }, []);
-
-   if (user === undefined) {
-    // Still loading user info
-    return (
-      <nav className="relative bg-[#0A236D] p-4">
-        <div className="h-16 flex items-center justify-center">
-          <div className="h-10 w-10 bg-gray-300 rounded-full animate-pulse"></div>
-        </div>
-      </nav>
-    );
-  }
+export default function Navbar({ hideContent }) {
+  const { user } = useUser();
 
   return (
     <div>

@@ -1,24 +1,26 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useUser } from '../contexts/UserContext';
 
 export default function Login() {
+  const { setUser } = useUser();
   const navigate = useNavigate();
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [user, setUser] = useState({
+  const [credentials, setCredentials] = useState({
     username: '',
     password: ''
   });
 
   const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!user.username || !user.password) {
+    if (!credentials.username || !credentials.password) {
       setErrors(["Username and password are required"]);
       return;
     }
@@ -26,14 +28,13 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/users/login', user, {withCredentials: true});
+      const response = await axios.post('http://localhost:8080/users/login', credentials , {withCredentials: true});
       if (response.status === 200) {
         const meResponse = await axios.get('http://localhost:8080/users/me',
           { withCredentials:true });
         if(meResponse.data.authenticated) {
           setUser(meResponse.data.user);
         }
-        
         navigate('/');
       }
     } catch (error) {
