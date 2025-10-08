@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 export default function Home() {
 
@@ -108,10 +107,11 @@ export default function Home() {
 
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
     
-    {/* Card 1 */}
+    {/* Card 1
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <img
-        src="https://via.placeholder.com/400x200"
+        //src="https://via.placeholder.com/400x200"
+        src=""
         alt="Card 1"
         className="w-full h-48 object-cover"
       />
@@ -121,10 +121,11 @@ export default function Home() {
       </div>
     </div>
 
-    {/* Card 2 */}
+     Card 2 
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <img
-        src="https://via.placeholder.com/400x200"
+        //src="https://via.placeholder.com/400x200"
+        src=""
         alt="Card 2"
         className="w-full h-48 object-cover"
       />
@@ -134,10 +135,11 @@ export default function Home() {
       </div>
     </div>
 
-    {/* Card 3 */}
+    Card 3 
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <img
-        src="https://via.placeholder.com/400x200"
+        //src="https://via.placeholder.com/400x200"
+        src=""
         alt="Card 3"
         className="w-full h-48 object-cover"
       />
@@ -145,7 +147,7 @@ export default function Home() {
         <h2 className="text-xl font-bold text-gray-800 mb-2">Card 3 Title</h2>
         <p className="text-gray-600 text-sm">Card 3 description goes here.</p>
       </div>
-    </div>
+    </div> */}
 
   </div>
 </div>

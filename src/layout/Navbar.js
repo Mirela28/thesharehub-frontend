@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from '../assets/logo.png';
+import account from '../assets/account.png';
 import { Link } from 'react-router-dom';
-
+import { useUser } from '../contexts/UserContext';
 
 export default function Navbar({ hideContent }) {
+  const { user } = useUser();
+
   return (
     <div>
 
@@ -62,14 +65,21 @@ export default function Navbar({ hideContent }) {
             >
               Categories
             </a>
+
+            {user === undefined ? (
+              <div className="h-10 w-10 bg-gray-300 rounded-full animate-pulse"></div>
+            ) : user ? (
+              <img
+                src={account}
+                alt="Profile"
+                className="h-10 w-10 rounded-full object-cover"
+              />
+            ) : (
             <Link to="/login" className="rounded-md bg-[#3B82F6] px-3 py-2 text-sm font-medium text-white">
                 Log in
             </Link>
-          </div>
-        </div>
-      )}
-      </div>
-      {!hideContent && (
+            )}
+        
       <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
         <button
           type="button"
@@ -93,9 +103,12 @@ export default function Navbar({ hideContent }) {
           </svg>
         </button>
       </div>
+      </div>
+      </div>
       )}
     </div>
   </div>
+</div>
 </nav>
 
 

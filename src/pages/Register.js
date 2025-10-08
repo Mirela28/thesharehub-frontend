@@ -1,54 +1,61 @@
-import { React, useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useUser } from '../contexts/UserContext';
 
 export default function Register() {
-    let navigate = useNavigate();
+  const { setUser } = useUser();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-    const [user, setUser] = useState({
-        name: '',
-        username: '',
-        email: '',
-        phone: '',
-        city: '',
-        password: '',
-        confirmPassword: '',
-    });
+  const [credentials, setCredentials] = useState({
+    name: '',
+    username: '',
+    email: '',
+    phone: '',
+    city: '',
+    password: '',
+    confirmPassword: ''
+  });
 
-    const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState([]);
 
-    const handleChange = (e) => {
-        setUser({ ...user, [e.target.name]: e.target.value });
-    };
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
 
-    const onSubmit = async(e) => {
-        e.preventDefault();
-        setErrors([]);
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setErrors([]);
+    setLoading(true);
 
-        try{
-        const response = await axios.post('http://localhost:8080/users/signup', user);
-        if(response.status === 201){
-          alert("Registration successful! Please log in.");
-          navigate('/login');
-        }
-        }catch(error){
-            if (error.response && error.response.status === 400) {
-              setErrors(error.response.data.errors);
-            }
-            else {
-              setErrors(["An unexpected error occurred. Please try again."]);
-            }
-        }
-    };
+    try {
+      const response = await axios.post('http://localhost:8080/users/signup', credentials, {withCredentials: true});
+      if (response.status === 201) {
+        alert("Registration successful!");
+        setUser(response.data);
+        navigate('/');
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        setErrors(error.response.data.errors);
+      }
+      else {
+        setErrors(["An unexpected error occurred. Please try again."]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const cities = [
-        'Amsterdam',
-        'Rotterdam',
-        'The Hague',
-        'Utrecht',
-        'Eindhoven',
-        'Maastricht',
-    ];
+  const cities = [
+    'Amsterdam',
+    'Rotterdam',
+    'The Hague',
+    'Utrecht',
+    'Eindhoven',
+    'Maastricht',
+  ];
 
   return (
     <div className="flex flex-col items-center justify-start px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -73,7 +80,7 @@ export default function Register() {
                 id="name"
                 placeholder="John"
                 required
-                value={user.name}
+                value={credentials.name}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
@@ -86,10 +93,10 @@ export default function Register() {
               <input
                 type="text"
                 name="username"
-                id="username"
+                id="usernJohn389ame"
                 placeholder="John389"
                 required
-                value={user.username}
+                value={credentials.username}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
@@ -105,7 +112,7 @@ export default function Register() {
                 id="email"
                 placeholder="name@gmail.com"
                 required
-                value={user.email}
+                value={credentials.email}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
@@ -121,7 +128,7 @@ export default function Register() {
                 id="phone"
                 placeholder="+31 6 12345678"
                 required
-                value={user.phone}
+                value={credentials.phone}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
@@ -132,10 +139,10 @@ export default function Register() {
                 City
               </label>
               <select
-                name ="city"
+                name="city"
                 id="city"
                 required
-                value={user.city}
+                value={credentials.city}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               >
@@ -158,7 +165,7 @@ export default function Register() {
                 id="password"
                 placeholder="••••••••"
                 required
-                value={user.password}
+                value={credentials.password}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
@@ -174,25 +181,41 @@ export default function Register() {
                 id="confirmPassword"
                 placeholder="••••••••"
                 required
-                value={user.confirmPassword}
+                value={credentials.confirmPassword}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
             </div>
+
             <button
               type="submit"
-              className="w-full text-white bg-[#3B82F6] hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-[#3B82F6] font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              disabled={loading}
+              className={`w-full text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center
+              ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#3B82F6] hover:bg-blue-700'} 
+              focus:ring-4 focus:outline-none focus:ring-[#3B82F6]`}
             >
-              Create an account
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  {/* Spinner */}
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                  </svg>
+                  Creating...
+                </div>
+              ) : (
+                'Create an account'
+              )}
             </button>
 
+
             {errors.length > 0 && (
-            <div className="mb-4">
-              {errors.map((error, index) => (
-                <p key={index} className="text-red-500 text-sm">{error}</p>
-              ))}
-            </div>
-          )}
+              <div className="mb-4">
+                {errors.map((error, index) => (
+                  <p key={index} className="text-red-500 text-sm">{error}</p>
+                ))}
+              </div>
+            )}
 
             <p className="text-sm font-light text-gray-500">
               Already have an account?{' '}
