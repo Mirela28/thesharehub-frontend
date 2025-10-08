@@ -30,13 +30,9 @@ export default function Login() {
     try {
       const response = await axios.post('http://localhost:8080/users/login', credentials , {withCredentials: true});
       if (response.status === 200) {
-        const meResponse = await axios.get('http://localhost:8080/users/me',
-          { withCredentials:true });
-        if(meResponse.data.authenticated) {
-          setUser(meResponse.data.user);
-        }
+        setUser(response.data);
         navigate('/');
-      }
+        }
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setErrors(error.response.data.errors);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useUser } from '../contexts/UserContext';
 
 export default function Register() {
   const { setUser } = useUser();
@@ -29,14 +30,11 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/users/signup', credentials);
+      const response = await axios.post('http://localhost:8080/users/signup', credentials, {withCredentials: true});
       if (response.status === 201) {
         alert("Registration successful!");
-        const meResponse = await axios.get('http://localhost:8080/users/me',
-          { withCredentials:true });
-        if(meResponse.data.authenticated) {
-          setUser(meResponse.data.user);
-        }
+        setUser(response.data);
+        navigate('/');
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -82,7 +80,7 @@ export default function Register() {
                 id="name"
                 placeholder="John"
                 required
-                value={user.name}
+                value={credentials.name}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
@@ -98,7 +96,7 @@ export default function Register() {
                 id="usernJohn389ame"
                 placeholder="John389"
                 required
-                value={user.username}
+                value={credentials.username}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
@@ -114,7 +112,7 @@ export default function Register() {
                 id="email"
                 placeholder="name@gmail.com"
                 required
-                value={user.email}
+                value={credentials.email}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
@@ -130,7 +128,7 @@ export default function Register() {
                 id="phone"
                 placeholder="+31 6 12345678"
                 required
-                value={user.phone}
+                value={credentials.phone}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
@@ -144,7 +142,7 @@ export default function Register() {
                 name="city"
                 id="city"
                 required
-                value={user.city}
+                value={credentials.city}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               >
@@ -167,7 +165,7 @@ export default function Register() {
                 id="password"
                 placeholder="••••••••"
                 required
-                value={user.password}
+                value={credentials.password}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
@@ -183,7 +181,7 @@ export default function Register() {
                 id="confirmPassword"
                 placeholder="••••••••"
                 required
-                value={user.confirmPassword}
+                value={credentials.confirmPassword}
                 onChange={(e) => handleChange(e)}
                 className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
               />
