@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Register() {
+  const { setUser } = useUser();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const [user, setUser] = useState({
+  const [credentials, setCredentials] = useState({
     name: '',
     username: '',
     email: '',
@@ -19,7 +20,7 @@ export default function Register() {
   const [errors, setErrors] = useState([]);
 
   const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
   const onSubmit = async (e) => {
@@ -28,10 +29,14 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/users/signup', user);
+      const response = await axios.post('http://localhost:8080/users/signup', credentials);
       if (response.status === 201) {
-        alert("Registration successful! Please log in.");
-        navigate('/login');
+        alert("Registration successful!");
+        const meResponse = await axios.get('http://localhost:8080/users/me',
+          { withCredentials:true });
+        if(meResponse.data.authenticated) {
+          setUser(meResponse.data.user);
+        }
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {

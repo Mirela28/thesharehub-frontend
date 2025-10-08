@@ -38,8 +38,12 @@ export default function Login() {
         navigate('/');
       }
     } catch (error) {
-      const msg = error.response?.data || "An unexpected error occurred. Please try again.";
-      setErrors(Array.isArray(msg) ? msg : [msg]);
+      if (error.response && error.response.status === 400) {
+        setErrors(error.response.data.errors);
+      }
+      else {
+        setErrors(["An unexpected error occurred. Please try again."]);
+      }
     } finally {
       setLoading(false);
     }
