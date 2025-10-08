@@ -14,7 +14,9 @@ export function UserProvider({ children }) {
                 });
                 if (res.data.authenticated) {
                     setUser(res.data.user);
-                } else {
+                } else if (res.data.user) {
+                    setUser(res.data)
+                }else {
                     setUser(null);
                 }
             } catch {
