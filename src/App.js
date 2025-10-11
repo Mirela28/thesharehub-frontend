@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { UserProvider } from './contexts/UserContext';
+import Account from './pages/Account';
 
 function App() {
   const location = useLocation();
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/account" element={<Account />} />
         </Routes>
       </UserProvider>
     </div>
