@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import logo from '../assets/logo.png';
-import account from '../assets/account.png';
+import logo from '../../assets/logo.png';
+import account from '../../assets/account.png';
 import { Link, useNavigate } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
+import { useUser } from '../../contexts/UserContext';
 import axios from 'axios';
 
 export default function Navbar({ hideContent }) {

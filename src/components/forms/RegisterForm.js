@@ -1,0 +1,196 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useUser } from '../../contexts/UserContext';
+import { registerUser } from '../../services/UserService';
+
+export default function RegisterForm() {
+    const { setUser } = useUser();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [credentials, setCredentials] = useState({
+        name: '', username: '', email: '', phone: '', city: '', password: '', confirmPassword: ''
+    });
+    const [errors, setErrors] = useState([]);
+
+    const cities = ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Maastricht'];
+
+    const handleChange = (e) => {
+        setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    };
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        setErrors([]);
+        setLoading(true);
+
+        const { success, data, errorMessages } = await registerUser(credentials);
+
+        if (success) {
+            alert("Registration successful!");
+            setUser(data);
+            navigate('/');
+        } else {
+            setErrors(errorMessages);
+        }
+
+        setLoading(false);
+    };
+
+    return (
+        <form onSubmit={(e) => onSubmit(e)} className="space-y-4 md:space-y-6">
+            <div>
+                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">
+                    Name
+                </label>
+                <input
+                    type="text"
+                    name="name"
+                    id="name"
+                    placeholder="John"
+                    required
+                    value={credentials.name}
+                    onChange={(e) => handleChange(e)}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
+                />
+            </div>
+
+            <div>
+                <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-900">
+                    Username
+                </label>
+                <input
+                    type="text"
+                    name="username"
+                    id="usernJohn389ame"
+                    placeholder="John389"
+                    required
+                    value={credentials.username}
+                    onChange={(e) => handleChange(e)}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
+                />
+            </div>
+
+            <div>
+                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">
+                    Email
+                </label>
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    placeholder="name@gmail.com"
+                    required
+                    value={credentials.email}
+                    onChange={(e) => handleChange(e)}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
+                />
+            </div>
+
+            <div>
+                <label htmlFor="phone" className="block mb-2 text-sm font-medium text-gray-900">
+                    Phone
+                </label>
+                <input
+                    type="tel"
+                    name="phone"
+                    id="phone"
+                    placeholder="+31 6 12345678"
+                    required
+                    value={credentials.phone}
+                    onChange={(e) => handleChange(e)}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
+                />
+            </div>
+
+            <div>
+                <label htmlFor="city" className="block mb-2 text-sm font-medium text-gray-900">
+                    City
+                </label>
+                <select
+                    name="city"
+                    id="city"
+                    required
+                    value={credentials.city}
+                    onChange={(e) => handleChange(e)}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
+                >
+                    <option value="">Select your city</option>
+                    {cities.map((city) => (
+                        <option key={city} value={city}>
+                            {city}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div>
+                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900">
+                    Password
+                </label>
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="••••••••"
+                    required
+                    value={credentials.password}
+                    onChange={(e) => handleChange(e)}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
+                />
+            </div>
+
+            <div>
+                <label htmlFor="confirmPassword" className="block mb-2 text-sm font-medium text-gray-900">
+                    Confirm password
+                </label>
+                <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    placeholder="••••••••"
+                    required
+                    value={credentials.confirmPassword}
+                    onChange={(e) => handleChange(e)}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-[#3B82F6] focus:border-[#3B82F6] block w-full p-2.5"
+                />
+            </div>
+
+            <button
+                type="submit"
+                disabled={loading}
+                className={`w-full text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center
+                  ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#3B82F6] hover:bg-blue-700'} 
+                  focus:ring-4 focus:outline-none focus:ring-[#3B82F6]`}
+            >
+                {loading ? (
+                    <div className="flex items-center justify-center gap-2">
+                        {/* Spinner */}
+                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                        </svg>
+                        Creating...
+                    </div>
+                ) : (
+                    'Create an account'
+                )}
+            </button>
+
+
+            {errors.length > 0 && (
+                <div className="mb-4">
+                    {errors.map((error, index) => (
+                        <p key={index} className="text-red-500 text-sm">{error}</p>
+                    ))}
+                </div>
+            )}
+
+            <p className="text-sm font-light text-gray-500">
+                Already have an account?{' '}
+                <Link to="/login" className="font-medium text-[#3B82F6] hover:underline">
+                    Login
+                </Link>
+            </p>
+        </form>
+    );
+}
