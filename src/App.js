@@ -1,11 +1,13 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import './index.css';
-import Navbar from './layout/Navbar';
+import Navbar from './components/layout/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { UserProvider } from './contexts/UserContext';
+import Account from './pages/Account';
+import CreateItem from './pages/CreateItem'
 
 function App() {
   const location = useLocation();
@@ -20,6 +22,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/createitem" element={<CreateItem />} />
         </Routes>
       </UserProvider>
     </div>
