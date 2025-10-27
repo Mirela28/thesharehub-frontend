@@ -27,9 +27,9 @@ export default function Login() {
         setErrors([]);
         setLoading(true);
 
-        const { succes, data, errorMessages } = await loginUser(credentials);
+        const { success, data, errorMessages } = await loginUser(credentials);
 
-        if(succes) {
+        if(success) {
             setUser(data);
             navigate("/")
         } else {
