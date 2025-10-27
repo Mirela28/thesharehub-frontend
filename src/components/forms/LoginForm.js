@@ -33,7 +33,7 @@ export default function Login() {
             setUser(data);
             navigate("/")
         } else {
-            setErrors(errorMessages)
+            setErrors(errorMessages || []);
         }
 
         setLoading(false);

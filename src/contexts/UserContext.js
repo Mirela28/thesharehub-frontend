@@ -12,11 +12,9 @@ export function UserProvider({ children }) {
                 const res = await axios.get('http://localhost:8080/users/me', {
                     withCredentials: true,
                 });
-                if (res.data.authenticated) {
+                if (res.data.authenticated && res.data.user) {
                     setUser(res.data.user);
-                } else if (res.data.user) {
-                    setUser(res.data)
-                }else {
+                } else {
                     setUser(null);
                 }
             } catch {
