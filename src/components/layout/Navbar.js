@@ -86,12 +86,12 @@ export default function Navbar({ hideContent }) {
                     >
                       Account
                     </a>
-                    <a
-                      href="#"
+                    <Link
+                      to="/categories"
                       className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white/5 hover:text-white"
                     >
                       Categories
-                    </a>
+                    </Link>
 
                     {user === undefined ? (
                       <div className="h-10 w-10 bg-gray-300 rounded-full animate-pulse"></div>
