@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import SearchBar from '../components/forms/SearchBar';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
+  const navigate = useNavigate();
+
+  const handleSearch = (query) => {
+    navigate(`/browseitems?search=${encodeURIComponent(query)}`);
+  };
 
   return (
     <div>
@@ -9,7 +15,7 @@ export default function Home() {
             All your rental needs in <span className="underline">one</span> place
         </p>
         <div className='mt-10'>
-        <SearchBar />
+        <SearchBar onSearch={handleSearch} />
         </div>
         <p className="mt-40 ml-[5.5rem] text-[1.8rem] text-left font-bold text-[#0A236D] font-inter">
             Top Rentals
