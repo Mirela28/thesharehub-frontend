@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import {  useNavigate } from 'react-router-dom';
 import { Hint } from '@progress/kendo-react-labels';
 import { useUser } from '../../contexts/UserContext';
 import { createItem } from '../../services/ItemService';
@@ -14,7 +13,6 @@ export default function CreateItem() {
         image: null,
         imagePreview: null
     });
-    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState([]);
 
