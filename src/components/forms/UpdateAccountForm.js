@@ -38,13 +38,13 @@ export default function Account() {
         setErrors([]);
         setLoading(true);
 
-        const { succes, data, errorMessages } = await updateUser(credentials);
+        const { success, data, errorMessages } = await updateUser(credentials);
 
-        if (succes) {
+        if (success) {
             alert("Account updated successfully");
             setUser(data);
         } else {
-            setErrors(errorMessages);
+            setErrors(errorMessages || []);
         }
 
         setLoading(false);

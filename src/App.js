@@ -8,6 +8,8 @@ import Register from './pages/Register';
 import { UserProvider } from './contexts/UserContext';
 import Account from './pages/Account';
 import CreateItem from './pages/CreateItem'
+import Categories from './pages/Categories';
+import BrowseItems from './pages/BrowseItems';
 
 function App() {
   const location = useLocation();
@@ -24,6 +26,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/account" element={<Account />} />
           <Route path="/createitem" element={<CreateItem />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/browseitems" element={<BrowseItems />} />
         </Routes>
       </UserProvider>
     </div>

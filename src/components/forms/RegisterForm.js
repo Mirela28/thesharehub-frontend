@@ -30,7 +30,7 @@ export default function RegisterForm() {
             setUser(data);
             navigate('/');
         } else {
-            setErrors(errorMessages);
+            setErrors(errorMessages || []);
         }
 
         setLoading(false);
