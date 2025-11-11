@@ -1,6 +1,23 @@
+import { Link, useNavigate } from "react-router-dom";
+import { useUser } from '../../contexts/UserContext';
+
 export const ItemCard = ({ item }) => {
+  const navigate = useNavigate();
+  const { user } = useUser();
+
+  const handleClick = () => {
+    if (!user) {
+      navigate('/login');
+    } else {
+      navigate(`/itempost/${item.id}`);
+    }
+  };
+
   return (
-    <div className="w-full bg-gray-50 rounded-lg shadow-sm flex flex-col items-center justify-center min-h-[12rem] hover:shadow-md transition-shadow">
+    <div
+      className="w-full bg-gray-50 rounded-lg shadow-sm flex flex-col items-center justify-center min-h-[12rem] hover:shadow-md transition-shadow"
+      onClick={handleClick}
+    >
       <img
         src={`data:image/jpeg;base64,${item.image}`}
         alt={item.name || 'Item image'}

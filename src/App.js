@@ -10,6 +10,7 @@ import Account from './pages/Account';
 import CreateItem from './pages/CreateItem'
 import Categories from './pages/Categories';
 import BrowseItems from './pages/BrowseItems';
+import ItemPost from './pages/ItemPost';
 
 function App() {
   const location = useLocation();
@@ -28,6 +29,7 @@ function App() {
           <Route path="/createitem" element={<CreateItem />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/browseitems" element={<BrowseItems />} />
+          <Route path="/itempost/:id" element={<ItemPost />} />
         </Routes>
       </UserProvider>
     </div>
