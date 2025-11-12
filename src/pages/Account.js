@@ -4,12 +4,13 @@ import UpdateAccountForm from '../components/forms/UpdateAccountForm';
 import { Link } from 'react-router-dom';
 
 export default function Account() {
-  const [items, setItems] = useState([]);
+  const [myOffers, setMyOffers] = useState([]);
+  const [myRents, setMyRents] = useState([]);
   return (
     <div className="w-full min-h-screen flex flex-col items-center">
       <p className="mt-10 text-[2.3rem] font-bold text-center text-[#0A236D] font-inter">
-            My Account
-        </p>
+        My Account
+      </p>
       <div className="mt-2 gap-4">
         <img
           src={account}
@@ -25,28 +26,58 @@ export default function Account() {
       </div>
 
       <div className='w-full'>
-      <div className='flex justify-start'>
-        <h3 className='mt-20 ml-[5.5rem] text-[1.8rem] text-left font-bold text-[#0A236D] font-inter'>My Offers</h3>
-      </div>
+        <div className='flex justify-start'>
+          <h3 className='mt-20 ml-[5.5rem] text-[1.8rem] text-left font-bold text-[#0A236D] font-inter'>My Offers</h3>
+        </div>
 
-      <div className='flex justify-start'>
-      {items.length > 0 ? (
         <div>
-          Items
+          <div className='flex justify-start'>
+            {myOffers.length > 0 ? (
+              <div>
+          // Render list of offers here
+              </div>
+            ) : (
+              <div>
+                <p className='mt-10 mb-10 ml-[5.5rem] text-gray-400'>You dont have any offers.</p>
+              </div>
+            )}
           </div>
-      ) : (
-        <div>
-          <p className='mt-10 mb-10 ml-[5.5rem] text-gray-400'>You dont have any items.</p>
-          </div>
-      )}
-      </div>
 
-      <Link
-      to="/createitem">
-      <div className='flex justify-start'>
-        <i className="fa fa-plus-circle mb-10 ml-[5.5rem] text-[3.5rem] text-[#3B82F6]"></i>
-      </div>
-      </Link>
+          <Link
+            to="/createitem">
+            <div className='flex justify-start'>
+              <i className="fa fa-plus-circle mb-10 ml-[5.5rem] text-[3.5rem] text-[#3B82F6]"></i>
+            </div>
+          </Link>
+        </div>
+
+        <div className='flex justify-start'>
+          <h3 className='mt-5 ml-[5.5rem] text-[1.8rem] text-left font-bold text-[#0A236D] font-inter'>My Rents</h3>
+        </div>
+
+        <div>
+          <div className='flex justify-start'>
+            {myRents.length > 0 ? (
+              <div>
+          // Render list of rents here
+              </div>
+            ) : (
+              <div>
+                <p className='mt-10 mb-5 ml-[5.5rem] text-gray-400'>You dont have any rents. Search for something</p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-start ml-[5.5rem] mt-2">
+            <Link
+              to="/categories"
+              className="rounded-md bg-[#3B82F6] px-4 py-3 mb-5 text-sm font-medium text-white hover:bg-blue-700 transition"
+            >
+              Categories
+            </Link>
+          </div>
+        </div>
+
       </div>
     </div>
   )
