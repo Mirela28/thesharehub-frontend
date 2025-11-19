@@ -15,6 +15,7 @@ export const ItemCard = ({ item }) => {
 
   return (
     <div
+      data-cy="item-card"
       className="w-full bg-gray-50 rounded-lg shadow-sm flex flex-col items-center justify-center min-h-[12rem] hover:shadow-md transition-shadow"
       onClick={handleClick}
     >

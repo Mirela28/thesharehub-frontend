@@ -38,7 +38,7 @@ export default function Account() {
               </div>
             ) : (
               <div>
-                <p className='mt-10 mb-10 ml-[5.5rem] text-gray-400'>You dont have any offers.</p>
+                <p className='mt-5 mb-5 ml-[5.5rem] text-gray-400'>You dont have any offers.</p>
               </div>
             )}
           </div>
@@ -63,18 +63,12 @@ export default function Account() {
               </div>
             ) : (
               <div>
-                <p className='mt-10 mb-5 ml-[5.5rem] text-gray-400'>You dont have any rents. Search for something</p>
+                <p className='mt-5 mb-10 ml-[5.5rem] text-gray-400'>You dont have any rents. <Link to='/categories' className='text-[#3B82F6] hover:underline'><span className="underline">Search for something</span></Link></p>
               </div>
             )}
           </div>
 
           <div className="flex justify-start ml-[5.5rem] mt-2">
-            <Link
-              to="/categories"
-              className="rounded-md bg-[#3B82F6] px-4 py-3 mb-5 text-sm font-medium text-white hover:bg-blue-700 transition"
-            >
-              Categories
-            </Link>
           </div>
         </div>
 
