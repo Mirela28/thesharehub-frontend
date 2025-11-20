@@ -1,0 +1,48 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build-test-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit/e2e tests (Cypress)
+        uses: cypress-io/github-action@v5
+        with:
+          start: npm start
+          wait-on: http://localhost:3000
+          wait-on-timeout: 60
+          browser: chrome
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push frontend image (tagged with sha + latest)
+        env:
+          IMAGE_BASE: ${{ secrets.DOCKERHUB_USERNAME }}/thesharehub-frontend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $IMAGE_BASE:latest -t $IMAGE_BASE:$IMAGE_TAG .
+          docker push $IMAGE_BASE:$IMAGE_TAG
+          docker push $IMAGE_BASE:latest
