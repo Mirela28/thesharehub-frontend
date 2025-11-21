@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ItemCard } from '../components/cards/ItemCard';
 import { useLocation } from 'react-router-dom';
 import SearchBar from '../components/forms/SearchBar';
@@ -15,7 +15,6 @@ export default function BrowseItems() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState([]);
   const [open, setOpen] = useState(false);
-  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
   const [filters, setFilters] = useState({

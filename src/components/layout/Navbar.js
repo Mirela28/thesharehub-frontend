@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import logo from '../../assets/logo.png';
 import account from '../../assets/account.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../../contexts/UserContext';
-import axios from 'axios';
 import { logoutUser } from '../../services/UserService'
 
 export default function Navbar({ hideContent }) {
