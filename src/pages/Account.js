@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import account from '../assets/account.png';
 import UpdateAccountForm from '../components/forms/UpdateAccountForm';
 import { Link } from 'react-router-dom';
