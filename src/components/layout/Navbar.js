@@ -18,7 +18,6 @@ export default function Navbar({ hideContent }) {
     const { succes } = await logoutUser();
 
     if (succes) {
-      alert("Logged out")
       setUser(null);
       navigate('/');
     } else {
@@ -27,6 +26,7 @@ export default function Navbar({ hideContent }) {
 
     setLoading(false);
     setDropdownOpen(false);
+    alert("Logged out")
   }
 
   const toggleDropdown = () => {
@@ -71,26 +71,27 @@ export default function Navbar({ hideContent }) {
               </div>
               {!hideContent && (
                 <div className="hidden sm:ml-6 sm:block">
-                  <div className="flex items-center space-x-4">
-                    <a
-                      href="#"
+                  <div className="flex items-center space-x-5">
+                    <Link
+                      to="/"
                       className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white/5 hover:text-white"
                     >
 
                       Home
-                    </a>
-                    <a
-                      href="#"
-                      className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white/5 hover:text-white"
-                    >
-                      Account
-                    </a>
+                    </Link>
                     <Link
                       to="/categories"
                       className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white/5 hover:text-white"
                     >
                       Categories
                     </Link>
+                    <Link
+                      to={user ? "/requests" : "/login"}
+                      className="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-white/5 hover:text-white"
+                    >
+                      Requests
+                    </Link>
+
 
                     {user === undefined ? (
                       <div className="h-10 w-10 bg-gray-300 rounded-full animate-pulse"></div>
