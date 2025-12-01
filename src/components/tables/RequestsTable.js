@@ -7,7 +7,8 @@ export default function RequestsTable({
   loading,
   errors,
   onStatusChange,
-  showActions = true
+  showActions = true,
+  userField = "requester"
 }) {
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -92,39 +93,42 @@ export default function RequestsTable({
               </tr>
             )}
 
-            {currentRequests.map((request) => (
-              <tr key={request.id} className='bg-neutral-primary border-b border-default'>
-                <td className="px-6 py-4 font-medium text-heading whitespace-nowrap">
-                  {request.id}
-                </td>
-                <td className="px-6 py-4 cursor-pointer text-blue-600 hover:underline" onClick={() => navigate(`/accountpage/${request.requester.id}`)}>{request.requester.username}</td>
-                <td className="px-6 py-4">{request.item.name}</td>
-                <td className="px-6 py-4">{formatDate(request.startDate)}</td>
-                <td className="px-6 py-4">{formatDate(request.endDate)}</td>
-                <td className="px-6 py-4 text-center">
-                  {showActions && request.status === "PENDING" ? (
-                    <div className='flex gap-2 justify-center'>
-                      <button
-                        className='bg-green-500 text-white px-3 py-1 rounded'
-                        onClick={() => onStatusChange(request.id, "APPROVED")}
-                      >
-                        Accept
-                      </button>
-                      <button
-                        className='bg-red-500 text-white px-3 py-1 rounded'
-                        onClick={() => onStatusChange(request.id, "REJECTED")}
-                      >
-                        Decline
-                      </button>
-                    </div>
-                  ) : (
-                    <span className={`font-medium ${getStatusColor(request.status)}`}>
-                      {request.status}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {currentRequests.map((request) => {
+              const user = request[userField];
+              return (
+                <tr key={request.id} className='bg-neutral-primary border-b border-default'>
+                  <td className="px-6 py-4 font-medium text-heading whitespace-nowrap">
+                    {request.id}
+                  </td>
+                  <td className="px-6 py-4 cursor-pointer text-blue-600 hover:underline" onClick={() => navigate(`/accountpage/${user.id}`)}>{user.username}</td>
+                  <td className="px-6 py-4">{request.item.name}</td>
+                  <td className="px-6 py-4">{formatDate(request.startDate)}</td>
+                  <td className="px-6 py-4">{formatDate(request.endDate)}</td>
+                  <td className="px-6 py-4 text-center">
+                    {showActions && request.status === "PENDING" ? (
+                      <div className='flex gap-2 justify-center'>
+                        <button
+                          className='bg-green-500 text-white px-3 py-1 rounded'
+                          onClick={() => onStatusChange(request.id, "APPROVED")}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          className='bg-red-500 text-white px-3 py-1 rounded'
+                          onClick={() => onStatusChange(request.id, "REJECTED")}
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    ) : (
+                      <span className={`font-medium ${getStatusColor(request.status)}`}>
+                        {request.status}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              )
+            })}
 
           </tbody>
         </table>
@@ -152,7 +156,6 @@ export default function RequestsTable({
         )}
 
       </div>
-
 
     </div>
   )

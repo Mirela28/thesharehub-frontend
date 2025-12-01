@@ -61,12 +61,13 @@ export default function Requests() {
     <div className="mt-5 w-full flex flex-col  gap-10">
 
       <RequestsTable
-        title="Requests You Received"
+        title="Requested Your Offers"
         requests={received}
         loading={receivedLoading}
         errors={errors}
         onStatusChange={handleStatusChange}
         showActions={true}
+        userField="requester"
       />
 
       <RequestsTable
@@ -75,6 +76,7 @@ export default function Requests() {
         loading={sentLoading}
         errors={errors}
         showActions={false}
+        userField="rentier"
       />
 
     </div>
