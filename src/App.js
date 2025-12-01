@@ -11,6 +11,8 @@ import CreateItem from './pages/CreateItem'
 import Categories from './pages/Categories';
 import BrowseItems from './pages/BrowseItems';
 import ItemPost from './pages/ItemPost';
+import Requests from './pages/Requests';
+import AccountPage from './pages/AccountPage';
 
 function App() {
   const location = useLocation();
@@ -30,6 +32,8 @@ function App() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/browseitems" element={<BrowseItems />} />
           <Route path="/itempost/:id" element={<ItemPost />} />
+          <Route path="/requests" element={<Requests />} />
+          <Route path="/accountpage/:id" element={<AccountPage />} />
         </Routes>
       </UserProvider>
     </div>
