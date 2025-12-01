@@ -13,3 +13,47 @@ export const createRent = async (rentData) => {
         return { success: false, errorMessages: ["An unexpected error occurred. Please try again."] };
     }
 };
+
+export const getReceivedRequests = async () => {
+    try {
+        const response = await axios.get('http://localhost:8080/rents/receivedrequests', { withCredentials: true });
+        if (response.status === 200) {
+            return { success: true, data: response.data };
+        }
+    } catch (error) {
+        if (error.response?.status === 400) {
+            return { success: false, errorMessages: error.response.data };
+        }
+        return { success: false, errorMessages: ["An unexpected error occurred. Please try again."] };
+    }
+};
+
+export const getSentRequests = async () => {
+    try {
+        const response = await axios.get('http://localhost:8080/rents/sentrequests', { withCredentials: true });
+        if (response.status === 200) {
+            return { success: true, data: response.data };
+        }
+    } catch (error) {
+        if (error.response?.status === 400) {
+            return { success: false, errorMessages: error.response.data };
+        }
+        return { success: false, errorMessages: ["An unexpected error occurred. Please try again."] };
+    }
+};
+
+export const changeStatus = async (rentId, newStatus) => {
+    try {
+        const response = await axios.put('http://localhost:8080/rents',
+            { id: rentId, status: newStatus},
+            { withCredentials: true });
+        if (response.status === 200) {
+            return { success: true, data: response.data };
+        }
+    } catch (error) {
+        if (error.response?.status === 400) {
+            return { success: false, errorMessages: error.response.data };
+        }
+        return { success: false, errorMessages: ["An unexpected error occurred. Please try again."] };
+    }
+};
