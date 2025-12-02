@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { getReceivedRequests, getSentRequests, changeStatus } from '../services/RentService';
 import RequestsTable from '../components/tables/RequestsTable';
+import SockJS from 'sockjs-client';
+import { Stomp } from "@stomp/stompjs";
 
 export default function Requests() {
 
@@ -56,6 +58,40 @@ export default function Requests() {
 
     loadReceived();
   };
+
+  useEffect(() => {
+    const socket = new SockJS("http://localhost:8080/ws");
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, () => {
+
+      received.forEach(req => {
+        stompClient.subscribe(`/topic/rents/${req.id}`, (message) => {
+          const update = JSON.parse(message.body);
+
+          setReceived(prev => 
+            prev.map(r => r.id === update.id ? update : r)
+          );
+        });
+      });
+
+      sent.forEach(req => {
+        stompClient.subscribe(`/topic/rents/${req.id}`, (message) => {
+          const update = JSON.parse(message.body);
+
+          setSent(prev => 
+            prev.map(r => r.id === update.id ? update : r)
+          );
+        });
+      });
+
+    });
+
+    return () => {
+      stompClient.disconnect();
+    };
+
+  }, [received, sent]);
 
   return (
     <div className="mt-5 w-full flex flex-col  gap-10">
