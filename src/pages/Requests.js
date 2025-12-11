@@ -6,25 +6,34 @@ import { Stomp } from "@stomp/stompjs";
 
 export default function Requests() {
 
-  const [received, setReceived] = useState([]);
-  const [sent, setSent] = useState([]);
+  const [receivedPage, setReceivedPage] = useState(null);
+  const [sentPage, setSentPage] = useState(null);
   const [receivedLoading, setReceivedLoading] = useState(false);
   const [sentLoading, setSentLoading] = useState(false);
-
   const [errors, setErrors] = useState([]);
+
+  const [receivedPagination, setReceivedPagination] = useState(
+    { page: 0, size: 5 });
+  const [sentPagination, setSentPagination] = useState(
+    { page: 0, size: 5 });
+
 
   useEffect(() => {
     loadReceived();
+  }, [receivedPagination]);
+
+  useEffect(() => {
     loadSent();
-  }, []);
+  }, [sentPagination]);
+
 
   const loadReceived = async () => {
     setReceivedLoading(true);
 
-    const { success, data, errorMessages = [] } = await getReceivedRequests();
+    const { success, data, errorMessages = [] } = await getReceivedRequests(receivedPagination);
 
     if (success) {
-      setReceived(data)
+      setReceivedPage(data)
     } else {
       setErrors(errorMessages || []);
     }
@@ -35,10 +44,10 @@ export default function Requests() {
   const loadSent = async () => {
     setSentLoading(true);
 
-    const { success, data, errorMessages = [] } = await getSentRequests();
+    const { success, data, errorMessages = [] } = await getSentRequests(sentPagination);
 
     if (success) {
-      setSent(data)
+      setSentPage(data)
     } else {
       setErrors(errorMessages || []);
     }
@@ -60,57 +69,68 @@ export default function Requests() {
   };
 
   useEffect(() => {
+    if (!receivedPage || !receivedPage.content) return;
+    if (!sentPage || !sentPage.content) return;
+
     const socket = new SockJS("http://localhost:8080/ws");
     const stompClient = Stomp.over(socket);
 
     stompClient.connect({}, () => {
 
-      received.forEach(req => {
+      receivedPage.content.forEach(req => {
         stompClient.subscribe(`/topic/rents/${req.id}`, (message) => {
           const update = JSON.parse(message.body);
 
-          setReceived(prev => 
-            prev.map(r => r.id === update.id ? update : r)
-          );
+          setReceivedPage(prev => ({
+            ...prev,
+            content: prev.content.map(r =>
+              r.id === update.id ? update : r
+            )
+          }));
         });
       });
 
-      sent.forEach(req => {
+      sentPage.content.forEach(req => {
         stompClient.subscribe(`/topic/rents/${req.id}`, (message) => {
           const update = JSON.parse(message.body);
 
-          setSent(prev => 
-            prev.map(r => r.id === update.id ? update : r)
-          );
+          setSentPage(prev => ({
+            ...prev,
+            content: prev.content.map(r =>
+              r.id === update.id ? update : r
+            )
+          }));
         });
       });
 
     });
 
-    return () => {
-      stompClient.disconnect();
-    };
+    return () => stompClient.disconnect();
 
-  }, [received, sent]);
+  }, [receivedPage, sentPage]);
+
+
 
   return (
     <div className="mt-5 w-full flex flex-col  gap-10">
 
       <RequestsTable
         title="Requested Your Offers"
-        requests={received}
+        page={receivedPage}
         loading={receivedLoading}
         errors={errors}
         onStatusChange={handleStatusChange}
+        onPageChange={(page) => setReceivedPagination(prev => ({ ...prev, page }))}
         showActions={true}
         userField="requester"
       />
 
       <RequestsTable
         title="Requests You Sent"
-        requests={sent}
+        page={sentPage}
         loading={sentLoading}
         errors={errors}
+        onPageChange={(page) => setSentPagination(prev => ({ ...prev, page }))}
         showActions={false}
         userField="rentier"
       />

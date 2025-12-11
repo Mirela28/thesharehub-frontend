@@ -14,9 +14,9 @@ export const createRent = async (rentData) => {
     }
 };
 
-export const getReceivedRequests = async () => {
+export const getReceivedRequests = async ({ page, size }) => {
     try {
-        const response = await axios.get('http://localhost:8080/rents/receivedrequests', { withCredentials: true });
+        const response = await axios.get('http://localhost:8080/rents/receivedrequests', { params: { page, size }, withCredentials: true });
         if (response.status === 200) {
             return { success: true, data: response.data };
         }
@@ -28,9 +28,9 @@ export const getReceivedRequests = async () => {
     }
 };
 
-export const getSentRequests = async () => {
+export const getSentRequests = async ({ page, size }) => {
     try {
-        const response = await axios.get('http://localhost:8080/rents/sentrequests', { withCredentials: true });
+        const response = await axios.get('http://localhost:8080/rents/sentrequests', { params: { page, size }, withCredentials: true });
         if (response.status === 200) {
             return { success: true, data: response.data };
         }
