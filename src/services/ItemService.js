@@ -51,3 +51,37 @@ export const getItemById = async (itemId) => {
         return { success: false, errorMessages: ["An unexpected error occurred. Please try again."] };
     }
 };
+
+export const getUserRentedItems = async ({ page, size }) => {
+    try {
+        const response = await axios.get(`http://localhost:8080/items/user/received-requests`, {
+            params: { page, size },
+            withCredentials: true
+        });
+        if (response.status === 200) {
+            return { success: true, data: response.data };
+        }
+    } catch (error) {
+        if (error.response?.status === 400) {
+            return { success: false, errorMessages: error.response.data };
+        }
+        return { success: false, errorMessages: ["An unexpected error occurred. Please try again."] };
+    }
+};
+
+export const getUserOfferedItems = async ({ page, size }) => {
+    try {
+        const response = await axios.get(`http://localhost:8080/items/user/offered-items`, {
+            params: { page, size },
+            withCredentials: true
+        });
+        if (response.status === 200) {
+            return { success: true, data: response.data };
+        }
+    } catch (error) {
+        if (error.response?.status === 400) {
+            return { success: false, errorMessages: error.response.data };
+        }
+        return { success: false, errorMessages: ["An unexpected error occurred. Please try again."] };
+    }
+};
