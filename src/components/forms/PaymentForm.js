@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import axios from 'axios';
 
-export default function PaymentForm({ amount, onSuccess }) {
+export default function PaymentForm({ amount, onSuccess, onClose }) {
 
     const stripe = useStripe();
     const elements = useElements();
@@ -36,6 +36,8 @@ export default function PaymentForm({ amount, onSuccess }) {
                 setMessage(result.error.message);
             } else if (result.paymentIntent?.status === "succeeded") {
                 setMessage("Payment Successful");
+
+                onClose();
                 onSuccess();
             }
         } catch (error) {
@@ -47,6 +49,7 @@ export default function PaymentForm({ amount, onSuccess }) {
         }
 
         setLoading(false);
+        setMessage(null);
     }
 
     return (

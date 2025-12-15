@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import ConfirmModal from "../modals/ConfirmModal";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function RequestsTable({
   title,
@@ -13,6 +14,15 @@ export default function RequestsTable({
 }) {
 
   const navigate = useNavigate();
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState("");
+
+  const openConfirmModal = (message, action) => {
+    setConfirmMessage(message);
+    setConfirmAction(() => action);
+    setConfirmModalOpen(true);
+  };
 
   if (!page) {
     return <div className="px-20">{loading ? "Loading..." : "No data"}</div>;
@@ -110,7 +120,11 @@ export default function RequestsTable({
                       <div className='flex gap-2 justify-center'>
                         <button
                           className='bg-green-500 text-white px-3 py-1 rounded'
-                          onClick={() => onStatusChange(r.id, "APPROVED")}
+                          onClick={() =>
+                            openConfirmModal(
+                              "approve this request? All other requests with conflicting dates will be automatically rejected",
+                              () => onStatusChange(r.id, "APPROVED")
+                            )}
                         >
                           Accept
                         </button>
@@ -121,11 +135,28 @@ export default function RequestsTable({
                           Decline
                         </button>
                       </div>
-                    ) : (
-                      <span className={`font-medium ${getStatusColor(r.status)}`}>
-                        {r.status}
-                      </span>
-                    )}
+                    ) : r.status === "APPROVED" ? (
+                      <div className='gap-3 flex justify-center'>
+                        <span className={`mt-1 font-medium ${getStatusColor(r.status)}`}>
+                          {r.status}
+                        </span>
+                        <button
+                          className='bg-gray-600 text-white px-3 py-1 rounded'
+                          onClick={() =>
+                            openConfirmModal(
+                              "cancel this request",
+                              () => onStatusChange(r.id, "CANCELLED")
+                            )}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) :
+                      (
+                        <span className={`font-medium ${getStatusColor(r.status)}`}>
+                          {r.status}
+                        </span>
+                      )}
                   </td>
                 </tr>
               );
@@ -157,6 +188,16 @@ export default function RequestsTable({
         )}
 
       </div>
+
+      <ConfirmModal
+        open={confirmModalOpen}
+        message={confirmMessage}
+        onConfirm={() => {
+          if (confirmAction) confirmAction();
+          setConfirmModalOpen(false);
+        }}
+        onClose={() => setConfirmModalOpen(false)}
+      />
 
     </div>
   )

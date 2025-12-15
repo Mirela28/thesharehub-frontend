@@ -3,7 +3,7 @@ import { ItemCard } from '../components/cards/ItemCard';
 import { useLocation } from 'react-router-dom';
 import SearchBar from '../components/forms/SearchBar';
 import { searchItems } from '../services/ItemService';
-import FiltersModal from '../components/forms/FiltersModal';
+import FiltersModal from '../components/modals/FiltersModal';
 
 export default function BrowseItems() {
   const location = useLocation();

@@ -3,7 +3,7 @@ import DatePicker from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { getItemById } from '../services/ItemService';
-import { createRent } from '../services/RentService';
+import { createRent,getApprovedRentDates } from '../services/RentService';
 import { Elements } from '@stripe/react-stripe-js';
 import { stripePromise } from '../components/forms/Stripe';
 import PaymentForm from '../components/forms/PaymentForm';
@@ -25,8 +25,14 @@ export default function ItemPost() {
     const { user } = useUser();
     const navigate = useNavigate();
     const [showPayment, setShowPayment] = useState(false);
+    const[blockedDates, setBlockedDates] = useState([]);
 
     useEffect(() => {
+        if (!user) {
+            navigate("/");
+            return;
+        }
+
         const fetchItem = async () => {
             const itemId = window.location.pathname.split('/').pop();
             const result = await getItemById(itemId);
@@ -39,6 +45,31 @@ export default function ItemPost() {
         };
         fetchItem();
     }, []);
+
+    useEffect(() => {
+        if(!item?.id) return;
+
+        const fetchBlockedDates = async () => {
+            const result = await getApprovedRentDates(item.id);
+            if(result.success) {
+                const dates = result.data.map(range => ({
+                    start: new Date(range.startDate),
+                    end: new Date(range.endDate)
+                }));
+                setBlockedDates(dates);
+            }
+        };
+
+        fetchBlockedDates();
+    }, [item]);
+
+    const isRangeBlocked = (start, end) => {
+        if (!start || !end) return false;
+
+        return blockedDates.some(range =>
+            start <= range.end && end >= range.start
+        );
+    };
 
     useEffect(() => {
         setRentData({
@@ -73,6 +104,19 @@ export default function ItemPost() {
         setShowPayment(true);
     };
 
+    const normalizeError = (err) => {
+        if (!err) return "Unexpected error";
+
+        if (Array.isArray(err)) return err.join(", ");
+
+        if (typeof err === "string") return err;
+
+        if (err.errors && Array.isArray(err.errors)) return err.errors.join(", ");
+
+        return "Unexpected error";
+    };
+
+
     const handlePaymentSuccess = async () => {
         setRequesting(true);
 
@@ -82,7 +126,7 @@ export default function ItemPost() {
             alert("Rent Requested Successfully!");
             setShowPayment(false);
         } else {
-            setMessage({ type: "error", text: errorMessages || [] });
+            setMessage({ type: "error", text: normalizeError(errorMessages) });
         }
 
         setRequesting(false);
@@ -194,9 +238,20 @@ export default function ItemPost() {
                                             startDate={startDate}
                                             endDate={endDate}
                                             minDate={new Date()}
-                                            onChange={(update) => setDateRange(update)}
+                                            onChange={(update) => {
+                                                const [start, end] = update;
+
+                                                if((start && end && isRangeBlocked(start, end))) {
+                                                    setMessage({ type: "error", text: "Selected dates overlap with existing approved rentals. Please choose different dates." });
+                                                    setDateRange([null, null]);
+                                                } else {
+                                                    setMessage(null);
+                                                    setDateRange(update);
+                                                }
+                                            }}
                                             placeholderText="No dates selected"
                                             dateFormat="dd/MM/yyyy"
+                                            excludeDateIntervals={blockedDates}
                                             calendarClassName="bg-white border border-gray-200 rounded-lg shadow"
                                             dayClassName={(date) =>
                                                 startDate && endDate && date >= startDate && date <= endDate
@@ -246,13 +301,23 @@ export default function ItemPost() {
                                 </button>
 
                                 {showPayment && (
-                                        <Elements stripe={stripePromise}>
-                                            <PaymentForm
-                                                amount={rentalDays * item.price}
-                                                onSuccess={handlePaymentSuccess}
-                                            />
-                                        </Elements>
-                                    )}
+                                    <Elements stripe={stripePromise}>
+                                        <PaymentForm
+                                            amount={rentalDays * item.price}
+                                            onSuccess={handlePaymentSuccess}
+                                            onClose={() => setShowPayment(false)}
+                                        />
+                                    </Elements>
+                                )}
+
+                                {message && (
+                                    <p
+                                        className={`text-sm mt-3 ${message.type === "error" ? "text-red-500" : "text-green-600"
+                                            }`}
+                                    >
+                                        {message.text}
+                                    </p>
+                                )}
                             </div>
                         )}
 
@@ -260,14 +325,6 @@ export default function ItemPost() {
 
 
                 </div>
-                {message && (
-                    <p
-                        className={`text-sm mb-10 ${message.type === "error" ? "text-red-500" : "text-green-600"
-                            }`}
-                    >
-                        {message.text}
-                    </p>
-                )}
 
             </div>
 
