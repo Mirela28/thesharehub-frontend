@@ -54,7 +54,7 @@ export const getItemById = async (itemId) => {
 
 export const getUserRentedItems = async ({ page, size }) => {
     try {
-        const response = await axios.get(`http://localhost:8080/items/user/received-requests`, {
+        const response = await axios.get(`http://localhost:8080/items/user/rented-items`, {
             params: { page, size },
             withCredentials: true
         });
@@ -75,6 +75,20 @@ export const getUserOfferedItems = async ({ page, size }) => {
             params: { page, size },
             withCredentials: true
         });
+        if (response.status === 200) {
+            return { success: true, data: response.data };
+        }
+    } catch (error) {
+        if (error.response?.status === 400) {
+            return { success: false, errorMessages: error.response.data };
+        }
+        return { success: false, errorMessages: ["An unexpected error occurred. Please try again."] };
+    }
+};
+
+export const getTop3RentedItems = async () => {
+    try {
+        const response = await axios.get(`http://localhost:8080/items/top-rentals`, { withCredentials: true});
         if (response.status === 200) {
             return { success: true, data: response.data };
         }

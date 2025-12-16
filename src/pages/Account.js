@@ -143,7 +143,7 @@ export default function Account() {
         </div>
 
         <div>
-          <div className='flex justify-start'>
+          <div className='w-full px-[5.5rem]'>
             {!rentsLoading && myRentsPage.content?.length > 0 ? (
               <div>
                 {renderItemCards(myRentsPage)}
