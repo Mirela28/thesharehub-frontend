@@ -25,7 +25,7 @@ export default function BrowseItems() {
     startDate: '',
     endDate: '',
     page: 0,
-    size: 10
+    size: 9
   });
 
   useEffect(() => {

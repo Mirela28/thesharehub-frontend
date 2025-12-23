@@ -170,6 +170,7 @@ export default function Requests() {
           page={sentPage}
           loading={sentLoading}
           errors={errors}
+          onStatusChange={handleStatusChange}
           onPageChange={(page) => setSentPagination(prev => ({ ...prev, page }))}
           showActions={false}
           userField="rentier"

@@ -101,7 +101,19 @@ export default function ItemPost() {
         }
 
         setMessage(null);
-        setShowPayment(true);
+        // setShowPayment(true);
+
+        setRequesting(true);
+
+        const { success, data, errorMessages } = await createRent(rentData);
+
+        if (success) {
+            alert("Rent Requested Successfully!");
+        } else {
+            setMessage({ type: "error", text: normalizeError(errorMessages) });
+        }
+
+        setRequesting(false);
     };
 
     const normalizeError = (err) => {
@@ -300,7 +312,7 @@ export default function ItemPost() {
                                     )}
                                 </button>
 
-                                {showPayment && (
+                                {/* {showPayment && (
                                     <Elements stripe={stripePromise}>
                                         <PaymentForm
                                             amount={rentalDays * item.price}
@@ -308,7 +320,7 @@ export default function ItemPost() {
                                             onClose={() => setShowPayment(false)}
                                         />
                                     </Elements>
-                                )}
+                                )} */}
 
                                 {message && (
                                     <p
