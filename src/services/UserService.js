@@ -1,8 +1,8 @@
-import axios from 'axios';
+import { api } from './client';
 
 export const registerUser = async (credentials) => {
     try {
-        const response = await axios.post('http://localhost:8080/users', credentials, { withCredentials: true });
+        const response = await api.post('http://localhost:8080/users', credentials);
         if (response.status === 201) {
             return { success: true, data: response.data };
         }
@@ -17,7 +17,7 @@ export const registerUser = async (credentials) => {
 
 export const loginUser = async (credentials) => {
     try {
-        const response = await axios.post('http://localhost:8080/users/login', credentials, { withCredentials: true });
+        const response = await api.post('http://localhost:8080/users/login', credentials);
         if (response.status === 200) {
             return { success: true, data: response.data }
         }
@@ -31,9 +31,8 @@ export const loginUser = async (credentials) => {
 
 export const logoutUser = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/users/logout', 
-        {},
-        {withCredentials: true},
+      const response = await api.post('http://localhost:8080/users/logout', 
+        {}
       );
       if (response.status === 200) {
         return { success: true }
@@ -48,7 +47,7 @@ export const logoutUser = async () => {
 
 export const updateUser = async (credentials) => {
     try {
-        const response = await axios.put('http://localhost:8080/users', credentials, { withCredentials: true });
+        const response = await api.put('http://localhost:8080/users', credentials);
         if (response.status === 200) {
             return { success: true, data: response.data }
         }
@@ -62,9 +61,7 @@ export const updateUser = async (credentials) => {
 
 export const getUserById = async (userId) => {
     try {
-        const response = await axios.get(`http://localhost:8080/users/${userId}`, {
-            withCredentials: true
-        });
+        const response = await api.get(`http://localhost:8080/users/${userId}`);
         if (response.status === 200) {
             return { success: true, data: response.data };
         }
