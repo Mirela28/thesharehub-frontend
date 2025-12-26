@@ -1,11 +1,94 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import account from '../assets/account.png';
 import UpdateAccountForm from '../components/forms/UpdateAccountForm';
 import { Link } from 'react-router-dom';
+import { getUserOfferedItems, getUserRentedItems } from '../services/ItemService';
+import { ItemCard } from '../components/cards/ItemCard';
 
 export default function Account() {
-  const [myOffers, setMyOffers] = useState([]);
-  const [myRents, setMyRents] = useState([]);
+  const [myOffersPage, setMyOffersPage] = useState([]);
+  const [myRentsPage, setMyRentsPage] = useState([]);
+
+  const [offersLoading, setOffersLoading] = useState(false);
+  const [rentsLoading, setRentsLoading] = useState(false);
+
+  const [errors, setErrors] = useState([]);
+
+  const [offersPagination, setOffersPagination] = useState(
+    { page: 0, size: 6 });
+  const [rentsPagination, setRentsPagination] = useState(
+    { page: 0, size: 6 });
+
+  useEffect(() => {
+    loadOffers();
+  }, [offersPagination]);
+
+  useEffect(() => {
+    loadRents();
+  }, [rentsPagination]);
+
+  const loadOffers = async () => {
+    setOffersLoading(true);
+
+    const { success, data, errorMessages = [] } = await getUserOfferedItems(offersPagination);
+
+    if (success) {
+      setMyOffersPage(data)
+    } else {
+      setErrors(errorMessages || []);
+    }
+
+    setOffersLoading(false);
+  }
+
+  const loadRents = async () => {
+    setRentsLoading(true);
+
+    const { success, data, errorMessages = [] } = await getUserRentedItems(rentsPagination);
+
+    if (success) {
+      setMyRentsPage(data)
+    } else {
+      setErrors(errorMessages || []);
+    }
+
+    setRentsLoading(false);
+  };
+
+  const renderItemCards = (page) => {
+    return (
+      <div className="mt-6 w-full grid grid-cols-2 md:grid-cols-3 gap-4">
+        {page.content.map((item) => (
+          <ItemCard key={item.id} item={item} />
+        ))}
+      </div>
+    );
+  }
+
+  const renderPagination = (page, onChange) => {
+    return (
+    <div className="flex justify-center gap-2 mt-4">
+      <button
+        disabled={page.number === 0}
+        className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        onClick={() => onChange(page.number - 1)}
+      >
+        Previous
+      </button>
+
+      <span>Page {page.number + 1} / {page.totalPages}</span>
+
+      <button
+        disabled={page.number === page.totalPages - 1}
+        className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        onClick={() => onChange(page.number + 1)}
+      >
+        Next
+      </button>
+    </div>
+    );
+  }
+
   return (
     <div className="w-full min-h-screen flex flex-col items-center">
       <p className="mt-10 text-[2.3rem] font-bold text-center text-[#0A236D] font-inter">
@@ -31,10 +114,14 @@ export default function Account() {
         </div>
 
         <div>
-          <div className='flex justify-start'>
-            {myOffers.length > 0 ? (
+          <div className='w-full px-[5.5rem]'>
+            {!offersLoading && myOffersPage.content?.length > 0 ? (
               <div>
-          // Render list of offers here
+                {renderItemCards(myOffersPage)}
+
+                {renderPagination(myOffersPage, page => {
+                  setOffersPagination(prev => ({ ...prev, page }));
+                })}
               </div>
             ) : (
               <div>
@@ -56,10 +143,14 @@ export default function Account() {
         </div>
 
         <div>
-          <div className='flex justify-start'>
-            {myRents.length > 0 ? (
+          <div className='w-full px-[5.5rem]'>
+            {!rentsLoading && myRentsPage.content?.length > 0 ? (
               <div>
-          // Render list of rents here
+                {renderItemCards(myRentsPage)}
+
+                {renderPagination(myRentsPage, page => {
+                  setRentsPagination(prev => ({ ...prev, page }));
+                })}
               </div>
             ) : (
               <div>

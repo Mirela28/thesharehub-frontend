@@ -3,7 +3,10 @@ import DatePicker from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { getItemById } from '../services/ItemService';
-import { createRent } from '../services/RentService';
+import { createRent,getApprovedRentDates } from '../services/RentService';
+import { Elements } from '@stripe/react-stripe-js';
+import { stripePromise } from '../components/forms/Stripe';
+import PaymentForm from '../components/forms/PaymentForm';
 
 export default function ItemPost() {
     const [item, setItem] = useState(null);
@@ -21,8 +24,15 @@ export default function ItemPost() {
 
     const { user } = useUser();
     const navigate = useNavigate();
+    const [showPayment, setShowPayment] = useState(false);
+    const[blockedDates, setBlockedDates] = useState([]);
 
     useEffect(() => {
+        if (!user) {
+            navigate("/");
+            return;
+        }
+
         const fetchItem = async () => {
             const itemId = window.location.pathname.split('/').pop();
             const result = await getItemById(itemId);
@@ -37,6 +47,31 @@ export default function ItemPost() {
     }, []);
 
     useEffect(() => {
+        if(!item?.id) return;
+
+        const fetchBlockedDates = async () => {
+            const result = await getApprovedRentDates(item.id);
+            if(result.success) {
+                const dates = result.data.map(range => ({
+                    start: new Date(range.startDate),
+                    end: new Date(range.endDate)
+                }));
+                setBlockedDates(dates);
+            }
+        };
+
+        fetchBlockedDates();
+    }, [item]);
+
+    const isRangeBlocked = (start, end) => {
+        if (!start || !end) return false;
+
+        return blockedDates.some(range =>
+            start <= range.end && end >= range.start
+        );
+    };
+
+    useEffect(() => {
         setRentData({
             itemId: item?.id,
             startDate: startDate ? startDate.toISOString() : null,
@@ -44,6 +79,10 @@ export default function ItemPost() {
         });
     }, [item, startDate, endDate]);
 
+    const rentalDays =
+        startDate && endDate
+            ? Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24))
+            : 0;
 
     const handleRequest = async () => {
         if (!startDate || !endDate) {
@@ -61,15 +100,45 @@ export default function ItemPost() {
             return;
         }
 
-        setRequesting(true);
         setMessage(null);
+        // setShowPayment(true);
+
+        setRequesting(true);
 
         const { success, data, errorMessages } = await createRent(rentData);
 
         if (success) {
             alert("Rent Requested Successfully!");
         } else {
-            setMessage({ type: "error", text: errorMessages || [] });
+            setMessage({ type: "error", text: normalizeError(errorMessages) });
+        }
+
+        setRequesting(false);
+    };
+
+    const normalizeError = (err) => {
+        if (!err) return "Unexpected error";
+
+        if (Array.isArray(err)) return err.join(", ");
+
+        if (typeof err === "string") return err;
+
+        if (err.errors && Array.isArray(err.errors)) return err.errors.join(", ");
+
+        return "Unexpected error";
+    };
+
+
+    const handlePaymentSuccess = async () => {
+        setRequesting(true);
+
+        const { success, data, errorMessages } = await createRent(rentData);
+
+        if (success) {
+            alert("Rent Requested Successfully!");
+            setShowPayment(false);
+        } else {
+            setMessage({ type: "error", text: normalizeError(errorMessages) });
         }
 
         setRequesting(false);
@@ -164,65 +233,110 @@ export default function ItemPost() {
                         <h3 className="text-lg font-semibold text-[#0A236D] text-left">
                             Request to Rent
                         </h3>
-                        <div className="flex item-center justify-between mb-4">
-                            <label className='text-sm mt-3 font-semibold text-gray-800'>
-                                Select Rental Dates:
-                            </label>
-                            <DatePicker
-                                selectsRange
-                                startDate={startDate}
-                                endDate={endDate}
-                                minDate={new Date()}
-                                onChange={(update) => setDateRange(update)}
-                                placeholderText="No dates selected"
-                                dateFormat="dd/MM/yyyy"
-                                calendarClassName="bg-white border border-gray-200 rounded-lg shadow"
-                                dayClassName={(date) =>
-                                    startDate && endDate && date >= startDate && date <= endDate
-                                        ? "bg-[#3B82F6] text-white rounded-none"
-                                        : undefined
-                                }
-                                selected={startDate}
-                                className="w-full border border-gray-300 text-center rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                            />
-                        </div>
 
-                        <div className="flex items-center mt-4">
-                            <input
-                                type="checkbox"
-                                id="declare"
-                                checked={checked}
-                                onChange={(e) => setChecked(e.target.checked)}
-                                className="w-4 h-4 text-[#3B82F6] bg-gray-100 border-gray-300 rounded focus:ring-[#3B82F6]"
-                            />
-                            <label htmlFor="declare" className="ml-2 text-sm font-semibold text-gray-800">
-                                I declare that I meet all the rental conditions
-                            </label>
-                        </div>
+                        {item.ownerId === user.id ? (
+                            <p className="mt-8 text-m italic font-semibold text-gray-700">
+                                This is your offer
+                            </p>
+                        ) : (
+                            <div>
+                                <div className="flex item-center justify-between mb-4">
+                                    <label className='text-sm mt-3 font-semibold text-gray-800'>
+                                        Select Rental Dates:
+                                    </label>
+                                    <div className='flex-col'>
+                                        <DatePicker
+                                            selectsRange
+                                            startDate={startDate}
+                                            endDate={endDate}
+                                            minDate={new Date()}
+                                            onChange={(update) => {
+                                                const [start, end] = update;
 
-                        <button
-                            onClick={handleRequest}
-                            disabled={requesting || !checked}
-                            className={`mt-4 w-[13rem] h-[2.8rem] text-white font-medium rounded-lg text-sm px-5 py-2.5
+                                                if((start && end && isRangeBlocked(start, end))) {
+                                                    setMessage({ type: "error", text: "Selected dates overlap with existing approved rentals. Please choose different dates." });
+                                                    setDateRange([null, null]);
+                                                } else {
+                                                    setMessage(null);
+                                                    setDateRange(update);
+                                                }
+                                            }}
+                                            placeholderText="No dates selected"
+                                            dateFormat="dd/MM/yyyy"
+                                            excludeDateIntervals={blockedDates}
+                                            calendarClassName="bg-white border border-gray-200 rounded-lg shadow"
+                                            dayClassName={(date) =>
+                                                startDate && endDate && date >= startDate && date <= endDate
+                                                    ? "bg-[#3B82F6] text-white rounded-none"
+                                                    : undefined
+                                            }
+                                            selected={startDate}
+                                            className="w-full border border-gray-300 text-center rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                                        />
+                                        {rentalDays > 0 && (
+                                            <div className="mt-2 text-sm font-semibold text-gray-800">
+                                                Total: <span className="text-[#0A236D]">{rentalDays * item.price} €</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center mt-4">
+                                    <input
+                                        type="checkbox"
+                                        id="declare"
+                                        checked={checked}
+                                        onChange={(e) => setChecked(e.target.checked)}
+                                        className="w-4 h-4 text-[#3B82F6] bg-gray-100 border-gray-300 rounded focus:ring-[#3B82F6]"
+                                    />
+                                    <label htmlFor="declare" className="ml-2 text-sm font-semibold text-gray-800">
+                                        I declare that I meet all the rental conditions
+                                    </label>
+                                </div>
+
+                                <button
+                                    onClick={handleRequest}
+                                    disabled={requesting || !checked}
+                                    className={`mt-4 w-[13rem] h-[2.8rem] text-white font-medium rounded-lg text-sm px-5 py-1.5
                         ${(requesting || !checked)
-                                    ? "bg-gray-400 cursor-not-allowed"
-                                    : "bg-[#3B82F6] hover:bg-blue-700"}
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-[#3B82F6] hover:bg-blue-700"}
                         focus:ring-4 focus:outline-none focus:ring-[#3B82F6]`}
-                        >
-                            {requesting ? "Sending Request..." : "Request to Rent"}
-                        </button>
+                                >
+                                    {requesting ? "Sending Request..." : (
+                                        <div>
+                                            Request to Rent
+                                            <br />
+                                            <p className='text-[0.8rem]'>(Pay with Stripe)</p>
+                                        </div>
+                                    )}
+                                </button>
+
+                                {/* {showPayment && (
+                                    <Elements stripe={stripePromise}>
+                                        <PaymentForm
+                                            amount={rentalDays * item.price}
+                                            onSuccess={handlePaymentSuccess}
+                                            onClose={() => setShowPayment(false)}
+                                        />
+                                    </Elements>
+                                )} */}
+
+                                {message && (
+                                    <p
+                                        className={`text-sm mt-3 ${message.type === "error" ? "text-red-500" : "text-green-600"
+                                            }`}
+                                    >
+                                        {message.text}
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                     </div>
 
+
                 </div>
-                {message && (
-                    <p
-                        className={`text-sm mb-10 ${message.type === "error" ? "text-red-500" : "text-green-600"
-                            }`}
-                    >
-                        {message.text}
-                    </p>
-                )}
 
             </div>
 

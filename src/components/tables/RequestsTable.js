@@ -1,24 +1,36 @@
-import { useState } from 'react'
+import ConfirmModal from "../modals/ConfirmModal";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function RequestsTable({
   title,
-  requests,
+  page,
   loading,
   errors,
   onStatusChange,
-  showActions = true
+  onPageChange,
+  showActions = true,
+  userField = "requester"
 }) {
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const requestsPerPage = 6;
   const navigate = useNavigate();
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState("");
 
-  const indexOfLastRequest = currentPage * requestsPerPage;
-  const indexOfFirstRequest = indexOfLastRequest - requestsPerPage;
-  const currentRequests = requests.slice(indexOfFirstRequest, indexOfLastRequest);
+  const openConfirmModal = (message, action) => {
+    setConfirmMessage(message);
+    setConfirmAction(() => action);
+    setConfirmModalOpen(true);
+  };
 
-  const totalPages = Math.ceil(requests.length / requestsPerPage);
+  if (!page) {
+    return <div className="px-20">{loading ? "Loading..." : "No data"}</div>;
+  }
+
+  const requests = page.content;
+  const currentPage = page.number;
+  const totalPages = page.totalPages;
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -92,39 +104,63 @@ export default function RequestsTable({
               </tr>
             )}
 
-            {currentRequests.map((request) => (
-              <tr key={request.id} className='bg-neutral-primary border-b border-default'>
-                <td className="px-6 py-4 font-medium text-heading whitespace-nowrap">
-                  {request.id}
-                </td>
-                <td className="px-6 py-4 cursor-pointer text-blue-600 hover:underline" onClick={() => navigate(`/accountpage/${request.requester.id}`)}>{request.requester.username}</td>
-                <td className="px-6 py-4">{request.item.name}</td>
-                <td className="px-6 py-4">{formatDate(request.startDate)}</td>
-                <td className="px-6 py-4">{formatDate(request.endDate)}</td>
-                <td className="px-6 py-4 text-center">
-                  {showActions && request.status === "PENDING" ? (
-                    <div className='flex gap-2 justify-center'>
-                      <button
-                        className='bg-green-500 text-white px-3 py-1 rounded'
-                        onClick={() => onStatusChange(request.id, "APPROVED")}
-                      >
-                        Accept
-                      </button>
-                      <button
-                        className='bg-red-500 text-white px-3 py-1 rounded'
-                        onClick={() => onStatusChange(request.id, "REJECTED")}
-                      >
-                        Decline
-                      </button>
-                    </div>
-                  ) : (
-                    <span className={`font-medium ${getStatusColor(request.status)}`}>
-                      {request.status}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {requests.map((r) => {
+              const user = r[userField];
+              return (
+                <tr key={r.id} className='bg-neutral-primary border-b border-default'>
+                  <td className="px-6 py-4 font-medium text-heading whitespace-nowrap">
+                    {r.id}
+                  </td>
+                  <td className="px-6 py-4 cursor-pointer text-blue-600 hover:underline" onClick={() => navigate(`/accountpage/${user.id}`)}>{user.username}</td>
+                  <td className="px-6 py-4">{r.item.name}</td>
+                  <td className="px-6 py-4">{formatDate(r.startDate)}</td>
+                  <td className="px-6 py-4">{formatDate(r.endDate)}</td>
+                  <td className="px-6 py-4 text-center">
+                    {showActions && r.status === "PENDING" ? (
+                      <div className='flex gap-2 justify-center'>
+                        <button
+                          className='bg-green-500 text-white px-3 py-1 rounded'
+                          onClick={() =>
+                            openConfirmModal(
+                              "approve this request? All other requests with conflicting dates will be automatically rejected",
+                              () => onStatusChange(r.id, "APPROVED")
+                            )}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          className='bg-red-500 text-white px-3 py-1 rounded'
+                          onClick={() => onStatusChange(r.id, "REJECTED")}
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    ) : r.status === "APPROVED" ? (
+                      <div className='gap-3 flex justify-center'>
+                        <span className={`mt-1 font-medium ${getStatusColor(r.status)}`}>
+                          {r.status}
+                        </span>
+                        <button
+                          className='bg-gray-600 text-white px-3 py-1 rounded'
+                          onClick={() =>
+                            openConfirmModal(
+                              "cancel this request",
+                              () => onStatusChange(r.id, "CANCELLED")
+                            )}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) :
+                      (
+                        <span className={`font-medium ${getStatusColor(r.status)}`}>
+                          {r.status}
+                        </span>
+                      )}
+                  </td>
+                </tr>
+              );
+            })}
 
           </tbody>
         </table>
@@ -132,19 +168,19 @@ export default function RequestsTable({
         {totalPages > 1 && (
           <div className="flex justify-center gap-2 mt-4">
             <button
-              disabled={currentPage === 1}
+              disabled={currentPage === 0}
               className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-              onClick={() => setCurrentPage(prev => prev - 1)}
+              onClick={() => onPageChange(currentPage - 1)}
             >
               Previous
             </button>
 
-            <span>Page {currentPage} / {totalPages}</span>
+            <span>Page {currentPage + 1} / {totalPages}</span>
 
             <button
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages - 1}
               className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-              onClick={() => setCurrentPage(prev => prev + 1)}
+              onClick={() => onPageChange(currentPage + 1)}
             >
               Next
             </button>
@@ -153,6 +189,15 @@ export default function RequestsTable({
 
       </div>
 
+      <ConfirmModal
+        open={confirmModalOpen}
+        message={confirmMessage}
+        onConfirm={() => {
+          if (confirmAction) confirmAction();
+          setConfirmModalOpen(false);
+        }}
+        onClose={() => setConfirmModalOpen(false)}
+      />
 
     </div>
   )
