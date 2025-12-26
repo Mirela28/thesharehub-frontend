@@ -2,7 +2,7 @@ import RegisterForm from '../components/forms/RegisterForm'
 
 export default function Register() {
   return (
-    <div className="flex flex-col items-center justify-start px-6 py-8 mx-auto md:h-screen lg:py-0">
+    <div className="flex flex-col items-center justify-start px-6 py-8 mx-auto">
       <p className="mt-10 mb-10 text-[1.5rem] font-bold text-center text-[#0A236D] font-inter italic">
         One account, endless rental possibilities
       </p>
