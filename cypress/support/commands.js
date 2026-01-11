@@ -11,3 +11,16 @@ Cypress.Commands.add("login", () => {
     expect(response.status).to.eq(200);
   });
 });
+
+Cypress.Commands.add("loginAsOtherUser", () => {
+  cy.request({
+    method: "POST",
+    url: "http://localhost:8080/users/login",
+    body: {
+      username: "otheruser",
+      password: "OtherPassword123!"
+    },
+    withCredentials: true
+  });
+});
+

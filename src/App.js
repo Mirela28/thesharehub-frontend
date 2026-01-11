@@ -14,6 +14,7 @@ import ItemPost from './pages/ItemPost';
 import Requests from './pages/Requests';
 import AccountPage from './pages/AccountPage';
 import Footer from './components/layout/Footer';
+import { fetchCsrfToken } from './services/client';
 
 function App() {
   const location = useLocation();
