@@ -35,15 +35,29 @@ export default function CreateItem() {
         setErrors([]);
         setLoading(true);
 
-        const formData = new FormData();
-        formData.append("name", item.name);
-        formData.append("description", item.description);
-        formData.append("conditions", item.conditions);
-        formData.append("category", item.category.toUpperCase());
-        formData.append("price", item.price);
-        formData.append("image", item.image);
+        let itemData;
+        let hasImage = false;
 
-        const { success, data, errorMessages = [] } = await createItem(formData);
+        if (item.image) {
+            hasImage = true;
+            itemData = new FormData();
+            itemData.append("name", item.name);
+            itemData.append("description", item.description);
+            itemData.append("conditions", item.conditions);
+            itemData.append("category", item.category.toUpperCase());
+            itemData.append("price", item.price);
+            itemData.append("image", item.image);
+        } else {
+            itemData = {
+                name: item.name,
+                description: item.description,
+                conditions: item.conditions,
+                category: item.category.toUpperCase(),
+                price: item.price
+            };
+        }
+
+        const { success, data, errorMessages = [] } = await createItem(itemData, hasImage);
 
         if(success) {
             alert("Item Created Successfully!");
