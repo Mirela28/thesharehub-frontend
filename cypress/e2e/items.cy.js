@@ -1,10 +1,18 @@
-describe("Items – End to End", () => {
+describe("Items E2E Tests", () => {
 
   beforeEach(() => {
-    cy.login();
+    cy.setupLoggedUser();
+
+    cy.createItem({
+      name: "Mountain Bike",
+      category: "TRANSPORT",
+      price: 10,
+      description: "Test bike for rental",
+      conditions: "Must return in good condition"
+    });
   });
 
-  it("should perform a search and display results", () => {
+  it("Searches and displays items", () => {
     cy.visit("/browseitems");
 
     const searchQuery = "bike";
@@ -16,11 +24,10 @@ describe("Items – End to End", () => {
 
     cy.url().should("include", `/browseitems?search=${encodeURIComponent(searchQuery)}`);
 
-    cy.get('[data-cy="item-card"]', { timeout: 10000 })
-      .should("exist");
+    cy.get('[data-cy="item-card"]').should("exist");
   });
 
-  it("should show 'No items found' when search yields no results", () => {
+  it("Shows 'No items found' when search yields no results", () => {
     cy.visit("/browseitems");
 
     cy.get('input[placeholder="Search for textbooks, bikes, etc."]')
@@ -30,5 +37,5 @@ describe("Items – End to End", () => {
 
     cy.contains("No items found.").should("be.visible");
   });
-
 });
+
