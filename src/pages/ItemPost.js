@@ -28,10 +28,10 @@ export default function ItemPost() {
     const[blockedDates, setBlockedDates] = useState([]);
 
     useEffect(() => {
-        if (!user) {
-            navigate("/");
-            return;
-        }
+        // if (!user) {
+        //     navigate("/");
+        //     return;
+        // }
 
         const fetchItem = async () => {
             const itemId = window.location.pathname.split('/').pop();
@@ -95,10 +95,10 @@ export default function ItemPost() {
             return;
         }
 
-        if (!user) {
-            navigate("/");
-            return;
-        }
+        // if (!user) {
+        //     navigate("/");
+        //     return;
+        // }
 
         setMessage(null);
         // setShowPayment(true);
@@ -164,11 +164,17 @@ export default function ItemPost() {
         <div className="space-y-4 md:space-y-6">
             <div className='flex gap-[5rem] mt-[3.5rem] justify-center'>
                 <div className='w-[32rem] h-[16rem]'>
-                    <img
-                        src={`data:image/jpeg;base64,${item.image}`}
-                        alt={item.name}
-                        className="w-full h-full max-h-[15rem] object-contain rounded-lg shadow"
-                    />
+                    {item.image ? (
+                        <img
+                            src={`data:image/jpeg;base64,${item.image}`}
+                            alt={item.name}
+                            className="w-full h-full max-h-[15rem] object-contain rounded-lg shadow"
+                        />
+                    ) : (
+                        <div className='w-full h-full bg-gray-200 rounded-lg shadow flex items-center justify-center'>
+                            <span className="text-gray-500">No image available</span>
+                        </div>
+                    )}
                 </div>
 
                 <div className='w-[30rem]'>

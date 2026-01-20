@@ -1,13 +1,15 @@
 import { api } from './client';
 
-export const createItem = async (formData) => {
+export const createItem = async (itemData, hasImage = true) => {
     try {
-        const response = await api.post('http://localhost:8080/items', formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                }
-            });
+        let response;
+        
+        if (hasImage && itemData instanceof FormData) {
+            response = await api.post('http://localhost:8080/items', itemData);
+        } else {
+            response = await api.post('http://localhost:8080/items/no-image', itemData);
+        }
+        
         if (response.status === 201) {
             return { success: true, data: response.data };
         }
