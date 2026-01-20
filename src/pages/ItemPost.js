@@ -28,10 +28,10 @@ export default function ItemPost() {
     const[blockedDates, setBlockedDates] = useState([]);
 
     useEffect(() => {
-        if (!user) {
-            navigate("/");
-            return;
-        }
+        // if (!user) {
+        //     navigate("/");
+        //     return;
+        // }
 
         const fetchItem = async () => {
             const itemId = window.location.pathname.split('/').pop();

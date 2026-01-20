@@ -28,9 +28,7 @@ describe("Rents E2E Tests", () => {
   });
 
   it("Should create a rent request", () => {
-    cy.visit(`/items/${itemId}`);
-
-    //itemId is defined, but the page does not load
+    cy.visit(`/itempost/${itemId}`); //fixed url
 
     cy.contains("Request to Rent").should("be.visible");
 
@@ -54,8 +52,14 @@ describe("Rents E2E Tests", () => {
       .check()
       .should("be.checked");
 
-    cy.contains("Request to Rent")
+    cy.window().then((win) => {
+      cy.stub(win, "alert").as("alert");
+    });
+
+    cy.contains("Request to Rent(Pay with Stripe)")
       .click();
+
+    cy.get("@alert").should("have.been.calledWith", "Rent Requested Successfully!");
 
   });
 });
